@@ -39,11 +39,7 @@ const conversion = async (req, res) => {
       const converter = DocumentConversionFactory.getConverter(document);
       // const convertedURL = await converter.convert(downloadURL, format);
 
-      return res.status(Constants.STATUS_CODES.OK).json({
-        success: true,
-        data: converter,
-        correlationId,
-      });
+      return res.status(Constants.STATUS_CODES.OK).json({ converter });
     } catch (conversionError) {
       console.error(`[${correlationId}] Conversion error:`, conversionError);
       return res.status(Constants.STATUS_CODES.INTERNAL_SERVER_ERROR).json({
