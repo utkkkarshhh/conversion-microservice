@@ -1,7 +1,7 @@
 // controllers/documentConversionController.js
 const express = require("express");
 const app = express();
-const { models } = require("../../docuvault-database");
+const Document = require("../models/document");
 const Messages = require("../constants/messages");
 const Constants = require("../constants/constants");
 const { storage } = require("../utils/firebase/firebase");
@@ -22,7 +22,7 @@ const conversion = async (req, res) => {
       });
     }
 
-    const document = await models.documents.findOne({
+    const document = await Document.findOne({
       where: { document_id: document_id },
     });
 
