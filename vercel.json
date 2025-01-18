@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "vercel-sapper"
-    },
-    {
       "src": "index.js",
       "use": "@vercel/node"
     }
@@ -19,5 +15,8 @@
         "Access-Control-Allow-Origin": "*"
       }
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
