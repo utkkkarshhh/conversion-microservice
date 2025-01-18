@@ -1,6 +1,7 @@
 {
-  "name": "docuvault-conversion-service",
+  "name": "Docuvault Conversion Service",
   "version": "1.0.0",
+  "description": "Conversion Service for Docuvault",
   "main": "index.js",
   "engines": {
     "node": ">=18.x"
@@ -11,12 +12,11 @@
     "dev": "nodemon index.js",
     "build": "npm install"
   },
-  "author": "",
+  "author": "Utkarsh Bhardwaj",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "docuvault-database": "github:utkkkarshhh/docuvault-database",
+    "docuvault-database": "github:utkkkarshhh/docuvault-database#main",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
