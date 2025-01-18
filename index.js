@@ -6,7 +6,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./utils/swagger/swagger");
 const conversionRouter = require("./routers/conversionRouter/conversionRouter");
-const {sequelize, models} = require("docuvault-database")
+const { sequelize } = require("docuvault-database");
 
 // Middlewares
 const app = express();
@@ -18,9 +18,12 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //Connect to Sequelize
-sequelize.authenticate().then(() => {
-  console.log('Conversion Service connected to database');
-}).catch(console.error);
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Conversion Service connected to database");
+  })
+  .catch(console.error);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
