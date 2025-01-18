@@ -12,6 +12,7 @@
     "dev": "nodemon index.js",
     "build": "npm install"
   },
+  "keywords": [],
   "author": "Utkarsh Bhardwaj",
   "license": "ISC",
   "dependencies": {
