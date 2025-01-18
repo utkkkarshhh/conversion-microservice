@@ -6,7 +6,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./utils/swagger/swagger");
 const conversionRouter = require("./routers/conversionRouter/conversionRouter");
-const {sequelize, models} = require("../docuvault-database")
+const {sequelize, models} = require("docuvault-database")
 
 // Middlewares
 const app = express();
@@ -34,6 +34,6 @@ app.use("/api", conversionRouter);
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(
-    `App is live on port http://localhost:${PORT} | Environment : ${process.env.ENIVRONMENT}`
+    `App is live on port http://localhost:${PORT} | Environment : ${process.env.NODE_ENV}`
   );
 });

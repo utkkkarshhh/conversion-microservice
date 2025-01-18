@@ -1,7 +1,7 @@
 // controllers/documentConversionController.js
 const express = require("express");
 const app = express();
-const { models } = require("../../docuvault-database");
+const { models } = require("docuvault-database");
 const Messages = require("../constants/messages");
 const Constants = require("../constants/constants");
 const { storage } = require("../utils/firebase/firebase");

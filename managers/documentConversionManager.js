@@ -1,7 +1,6 @@
 // managers/documentConversionManager.js
 const express = require("express");
 const app = express();
-const { models } = require("../../docuvault-database");
 const Messages = require("../constants/messages");
 const Constants = require("../constants/constants");
 const ImageConverter = require("../services/ImageConverter");
