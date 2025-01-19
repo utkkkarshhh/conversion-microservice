@@ -1,9 +1,12 @@
 const express = require("express");
 const app = express();
-const { models } = require("docuvault-database");
+const {
+  sequelize,
+  models: { documents: Document },
+} = require("docuvault-database");
 const Messages = require("../constants/messages");
 const Constants = require("../constants/constants");
-const { storage } = require("../utils/firebase/firebase");
+const { storage, ref, getDownloadURL } = require("../utils/firebase/firebase");
 const {
   DocumentConversionFactory,
 } = require("../managers/documentConversionManager");
@@ -11,47 +14,83 @@ const {
 app.use(express.json());
 
 const conversion = async (req, res) => {
-  const { document_id, user_id, format, metadata, correlationId } = req.body;
+  const { document_id, user_id, format, convert_format, correlationId } =
+    req.body;
+
   try {
-    if (!document_id || !format || !user_id) {
-      return res.status(Constants.STATUS_CODES.BAD_REQUEST).json({
+    // Input validation
+    if (!document_id || !format || !user_id || !convert_format) {
+      return res.status(Constants.Constants.STATUS_CODES.BAD_REQUEST).json({
         success: false,
         message: Messages.VALIDATION.DOCUMENT_ID_FORMAT_OBJECT,
         correlationId,
       });
     }
 
-    const document = await Document.findOne({
-      where: { document_id: document_id },
-    });
-
-    if (!document) {
-      return res.status(Constants.STATUS_CODES.NOT_FOUND).json({
-        success: false,
-        message: "Document not found",
-        correlationId,
-      });
-    }
+    // Create document object
+    const document = {
+      document_id,
+      user_id,
+      format,
+      convert_format,
+      correlationId,
+    };
 
     try {
-      // Use the factory to get the right converter
-      const converter = DocumentConversionFactory.getConverter(document);
-      // const convertedURL = await converter.convert(downloadURL, format);
+      const documentObject = await Document.findOne({
+        where: { id: document_id },
+      });
+      const fileName =
+        "c715c4c6-2d28-4f67-bd78-b0ac2ae4361c-Ericsson Cover.pdf";
 
-      return res.status(Constants.STATUS_CODES.OK).json({ converter });
+      const fileRef = ref(storage, fileName);
+      const downloadURL = await getDownloadURL(fileRef);
+
+      console.log(`Download URL: ${downloadURL}`);
+
+      // Get appropriate converter
+      const converter = await DocumentConversionFactory.getConverter(document);
+
+      // Perform conversion
+      const convertedURL = await converter.convert(
+        downloadURL,
+        convert_format.convert_to
+      );
+
+      console.log(`Converted URL: ${convertedURL}`); // Log for debugging
+
+      // Add explicit check for convertedURL
+      if (!convertedURL) {
+        throw new Error("Conversion completed but URL was not generated");
+      }
+
+      return res.status(Constants.Constants.STATUS_CODES.OK).json({
+        success: true,
+        data: {
+          convertedUrl: convertedURL,
+        },
+        correlationId,
+      });
+      
     } catch (conversionError) {
       console.error(`[${correlationId}] Conversion error:`, conversionError);
-      return res.status(Constants.STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Error converting document",
-      });
+      return res
+        .status(Constants.Constants.STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json({
+          success: false,
+          message: conversionError.message || "Error converting document",
+          correlationId,
+        });
     }
   } catch (error) {
     console.error(`[${correlationId}] Unexpected server error:`, error);
-    return res.status(Constants.STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Unexpected server error",
-    });
+    return res
+      .status(Constants.Constants.STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({
+        success: false,
+        message: "Unexpected server error",
+        correlationId,
+      });
   }
 };
 

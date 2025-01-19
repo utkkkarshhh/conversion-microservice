@@ -1,29 +1,47 @@
-const express = require("express");
-const app = express();
-const Messages = require("../constants/messages");
-const Constants = require("../constants/constants");
+const { SupportedTypeMapping } = require("../constants/constants");
 const ImageConverter = require("../services/ImageConverter");
-const DocumentConverter = require("../services/documentConverter");
-const { storage } = require("../utils/firebase/firebase");
-const { ref, getDownloadURL } = require("firebase/storage");
-
-
-app.use(express.json());
+const DocumentConverter = require("../services/DocumentConverter");
+const Messages = require("../constants/messages");
 
 class DocumentConversionFactory {
   static async getConverter(document) {
-    const fileRef = ref(storage, document.document_link);
-    const downloadURL = await getDownloadURL(fileRef);
-    const documentType = 'document';
-
-    console.log(`TYPE:-> ${documentType}`);
-    if (documentType === "image") {
-      return new ImageConverter();
-    } else if (documentType === "document") {
-      return new DocumentConverter();
-    } else {
-      throw new Error("Unsupported document type");
+    if (!document || !document.format) {
+      throw new Error(Messages.VALIDATION.DOCUMENT_ID_FORMAT_OBJECT);
     }
+
+    console.log(
+      `Processing conversion request - Document: ${document.document_id}, User: ${document.user_id}, Format: ${document.format}, Convert to: ${document.convert_format}`
+    );
+
+    const documentType = this.getDocumentType(document.format);
+
+    if (!documentType) {
+      throw new Error(Messages.VALIDATION.UNSUPPORTED_FORMAT);
+    }
+
+    console.log(`Document type identified: ${documentType}`);
+
+    switch (documentType) {
+      case "image":
+        return new ImageConverter();
+      case "document":
+        return new DocumentConverter();
+      default:
+        throw new Error(Messages.VALIDATION.UNSUPPORTED_FORMAT);
+    }
+  }
+
+  static getDocumentType(format) {
+    if (!format) return null;
+
+    const normalizedFormat = format.toLowerCase().trim();
+
+    for (const [type, formats] of Object.entries(SupportedTypeMapping)) {
+      if (formats.includes(normalizedFormat)) {
+        return type;
+      }
+    }
+    return null;
   }
 }
 
