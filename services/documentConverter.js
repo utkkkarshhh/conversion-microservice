@@ -6,8 +6,6 @@ class DocumentConverter {
     if (!documentLink) {
       throw new Error("Document link is required");
     }
-
-    console.log(`Converting document from ${documentLink} to ${targetFormat}`);
     try {
       const convertedUrl = await this.processDocumentConversion(
         documentLink,
@@ -28,7 +26,7 @@ class DocumentConverter {
     if (!conversionPossible) {
       return res.status(Constants.STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: `{currentFormat} cannot be converted to ${targetFormat}`,
+        message: `${currentFormat} cannot be converted to ${targetFormat}`,
       });
     }
     return `https://converted-storage.example.com/${Date.now()}_converted.${targetFormat}`;

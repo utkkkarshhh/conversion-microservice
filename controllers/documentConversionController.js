@@ -38,25 +38,15 @@ const conversion = async (req, res) => {
       const documentObject = await Document.findOne({
         where: { id: document_id },
       });
-      // const fileName =
-      //   "629c8c87-6563-473b-b5ee-3b243ba2fa95-Ericsson Cover.pdf";
-      const fileName = documentObject.name;
-      console.log(`--------------${fileName}`)
-
+      const fileName = documentObject.unique_name;
       const fileRef = ref(storage, fileName);
       const downloadURL = await getDownloadURL(fileRef);
-
-      console.log(`Download URL: ${downloadURL}`);
-
       const converter = await DocumentConversionFactory.getConverter(document);
-
       const convertedURL = await converter.convert(
         downloadURL,
         format,
         convert_format.convert_to
       );
-
-      console.log(`Converted URL: ${convertedURL}`);
 
       if (!convertedURL) {
         throw new Error("Conversion completed but URL was not generated");
