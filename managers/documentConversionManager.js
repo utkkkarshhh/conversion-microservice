@@ -1,4 +1,4 @@
-const { SupportedTypeMapping } = require("../constants/constants");
+const FormatCheck = require("./../utils/commonUtils/formatCheck");
 const ImageConverter = require("../services/ImageConverter");
 const DocumentConverter = require("../services/DocumentConverter");
 const Messages = require("../constants/messages");
@@ -13,7 +13,7 @@ class DocumentConversionFactory {
       `Processing conversion request - Document: ${document.document_id}, User: ${document.user_id}, Format: ${document.format}, Convert to: ${document.convert_format}`
     );
 
-    const documentType = this.getDocumentType(document.format);
+    const documentType = FormatCheck.getDocumentType(document.format);
 
     if (!documentType) {
       throw new Error(Messages.VALIDATION.UNSUPPORTED_FORMAT);
@@ -29,19 +29,6 @@ class DocumentConversionFactory {
       default:
         throw new Error(Messages.VALIDATION.UNSUPPORTED_FORMAT);
     }
-  }
-
-  static getDocumentType(format) {
-    if (!format) return null;
-
-    const normalizedFormat = format.toLowerCase().trim();
-
-    for (const [type, formats] of Object.entries(SupportedTypeMapping)) {
-      if (formats.includes(normalizedFormat)) {
-        return type;
-      }
-    }
-    return null;
   }
 }
 

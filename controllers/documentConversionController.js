@@ -18,7 +18,6 @@ const conversion = async (req, res) => {
     req.body;
 
   try {
-    // Input validation
     if (!document_id || !format || !user_id || !convert_format) {
       return res.status(Constants.Constants.STATUS_CODES.BAD_REQUEST).json({
         success: false,
@@ -27,7 +26,6 @@ const conversion = async (req, res) => {
       });
     }
 
-    // Create document object
     const document = {
       document_id,
       user_id,
@@ -40,26 +38,26 @@ const conversion = async (req, res) => {
       const documentObject = await Document.findOne({
         where: { id: document_id },
       });
-      const fileName =
-        "c715c4c6-2d28-4f67-bd78-b0ac2ae4361c-Ericsson Cover.pdf";
+      // const fileName =
+      //   "629c8c87-6563-473b-b5ee-3b243ba2fa95-Ericsson Cover.pdf";
+      const fileName = documentObject.name;
+      console.log(`--------------${fileName}`)
 
       const fileRef = ref(storage, fileName);
       const downloadURL = await getDownloadURL(fileRef);
 
       console.log(`Download URL: ${downloadURL}`);
 
-      // Get appropriate converter
       const converter = await DocumentConversionFactory.getConverter(document);
 
-      // Perform conversion
       const convertedURL = await converter.convert(
         downloadURL,
+        format,
         convert_format.convert_to
       );
 
-      console.log(`Converted URL: ${convertedURL}`); // Log for debugging
+      console.log(`Converted URL: ${convertedURL}`);
 
-      // Add explicit check for convertedURL
       if (!convertedURL) {
         throw new Error("Conversion completed but URL was not generated");
       }
@@ -71,7 +69,6 @@ const conversion = async (req, res) => {
         },
         correlationId,
       });
-      
     } catch (conversionError) {
       console.error(`[${correlationId}] Conversion error:`, conversionError);
       return res

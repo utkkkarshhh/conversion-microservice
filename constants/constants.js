@@ -22,4 +22,23 @@ const SupportedTypeMapping = {
   image: ["jpeg", "jpg", "png", "svg"],
 };
 
-module.exports = { Constants, SupportedTypeMapping };
+const SupportedFormatMapping = {
+  // Documents
+  csv: ["xls", "xlsx"],
+  xls: ["csv", "xlsx"],
+  xlsx: ["csv", "xls"],
+  doc: ["pdf", "docx"],
+  docx: ["pdf", "doc"],
+  // Images
+  pdf: ["doc", "docx"],
+  jpeg: ["jpg", "png", "svg"],
+  jpg: ["jpeg", "png", "svg"],
+  png: ["jpeg", "jpg", "svg"],
+  svg: ["jpeg", "jpg", "png"],
+};
+
+module.exports = {
+  Constants,
+  SupportedTypeMapping,
+  SupportedFormatMapping,
+};

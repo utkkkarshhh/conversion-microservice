@@ -1,5 +1,8 @@
+const FormatCheck = require("../utils/commonUtils/formatCheck");
+const { Constants } = require("./../constants/constants");
+
 class DocumentConverter {
-  async convert(documentLink, targetFormat) {
+  async convert(documentLink, currentFormat, targetFormat) {
     if (!documentLink) {
       throw new Error("Document link is required");
     }
@@ -8,6 +11,7 @@ class DocumentConverter {
     try {
       const convertedUrl = await this.processDocumentConversion(
         documentLink,
+        currentFormat,
         targetFormat
       );
       return convertedUrl;
@@ -16,7 +20,17 @@ class DocumentConverter {
     }
   }
 
-  async processDocumentConversion(documentLink, targetFormat) {
+  async processDocumentConversion(documentLink, currentFormat, targetFormat) {
+    const conversionPossible = FormatCheck.checkFormatCompatability(
+      currentFormat,
+      targetFormat
+    );
+    if (!conversionPossible) {
+      return res.status(Constants.STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: `{currentFormat} cannot be converted to ${targetFormat}`,
+      });
+    }
     return `https://converted-storage.example.com/${Date.now()}_converted.${targetFormat}`;
   }
 }
